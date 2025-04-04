@@ -5,11 +5,11 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 
+# ===== CONFIG =====
 DB_PATH = "quiz.db"
 QUIZ_PATH = Path("quiz_data.json")
 MAX_TIME = 30  # seconds per question
 
-# ===== SETUP =====
 st.set_page_config(page_title="🧠 Quiz Master", page_icon="❓", layout="centered")
 
 # ===== INIT DATABASE =====
@@ -26,6 +26,8 @@ def init_db():
         """)
         conn.commit()
 
+init_db()
+
 # ===== LOAD QUIZ =====
 if not QUIZ_PATH.exists():
     st.error("❌ 'quiz_data.json' not found. Upload it to the app folder.")
@@ -34,7 +36,7 @@ if not QUIZ_PATH.exists():
 with QUIZ_PATH.open(encoding="utf-8") as f:
     quiz_data = json.load(f)
 
-# ===== STATE INIT =====
+# ===== STATE DEFAULTS =====
 defaults = {
     'name': '',
     'current_index': 0,
@@ -47,22 +49,25 @@ defaults = {
 for k, v in defaults.items():
     st.session_state.setdefault(k, v)
 
-# ===== DB INSERT =====
+# ===== SAVE RESULT =====
 def save_result():
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute("""
-            INSERT INTO results (name, score, total_time, timestamp, session_id)
-            VALUES (?, ?, ?, ?, ?)
-        """, (
-            st.session_state.name,
-            st.session_state.score,
-            round(st.session_state.total_time, 2),
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            st.session_state.get("session_id", "unknown")
-        ))
-        conn.commit()
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            conn.execute("""
+                INSERT INTO results (name, score, total_time, timestamp, session_id)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                st.session_state.name,
+                st.session_state.score,
+                round(st.session_state.total_time, 2),
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                st.session_state.get("session_id", "unknown")
+            ))
+            conn.commit()
+    except Exception as e:
+        st.error(f"Error saving result: {e}")
 
-# ===== FORM: NAME INPUT =====
+# ===== NAME ENTRY =====
 if not st.session_state.name:
     st.title("🧠 Welcome to the IPL Quiz")
     st.subheader("Enter your name to begin")
@@ -77,7 +82,7 @@ if not st.session_state.name:
             st.session_state.session_id = st.runtime.scriptrunner.get_script_run_ctx().session_id[-6:]
             st.rerun()
 
-# ===== QUIZ FLOW =====
+# ===== QUIZ COMPLETED =====
 elif st.session_state.current_index >= len(quiz_data):
     st.balloons()
     st.title("🎉 Quiz Completed!")
@@ -89,8 +94,9 @@ elif st.session_state.current_index >= len(quiz_data):
             st.session_state[k] = defaults[k]
         st.session_state.name = ''
         st.rerun()
+
+# ===== QUIZ IN PROGRESS =====
 else:
-    # Question + Timer
     question = quiz_data[st.session_state.current_index]
     elapsed = round(time.time() - st.session_state.start_time)
     remaining = MAX_TIME - elapsed
@@ -109,16 +115,14 @@ else:
     st.caption(question.get("information", ""))
     st.markdown("---")
 
-    # Display options
     options = question["options"]
     answer = question["answer"]
 
     if st.session_state.answer_submitted:
+        st.markdown("### You selected:")
         for opt in options:
-            if opt == answer:
-                st.success(f"✅ {opt}")
-            elif opt == st.session_state.selected_option:
-                st.error(f"❌ {opt}")
+            if opt == st.session_state.selected_option:
+                st.info(opt)
             else:
                 st.write(opt)
     else:
@@ -128,8 +132,10 @@ else:
 
     st.markdown("---")
 
-    # Submit & Next
+    # ===== SUBMIT & NEXT =====
     def submit_answer():
+        if st.session_state.answer_submitted:
+            return
         if st.session_state.selected_option == answer:
             st.session_state.score += 10
         st.session_state.answer_submitted = True
@@ -148,9 +154,6 @@ else:
             st.button("✅ Finish", on_click=next_question)
     else:
         st.button("🚀 Submit", on_click=submit_answer)
-
-# ===== INIT DB ON LOAD =====
-init_db()
 
 # ===== CUSTOM STYLING =====
 st.markdown("""
