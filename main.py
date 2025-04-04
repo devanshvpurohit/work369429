@@ -2,18 +2,16 @@ import streamlit as st
 import sqlite3
 import pandas as pd
 import time
-import json
 from datetime import datetime
 
 DB_FILE = "quiz.db"
-QUIZ_JSON = "quiz_data.json"
 
 # === DB INIT ===
 def init_db():
     with sqlite3.connect(DB_FILE) as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS scores (
-                name TEXT UNIQUE,
+                name TEXT,
                 score INTEGER,
                 ip TEXT,
                 time_taken REAL,
@@ -43,20 +41,10 @@ def insert_score(name, score, ip, time_taken):
 def get_user_id():
     return st.runtime.scriptrunner.get_script_run_ctx().session_id[-6:]
 
-# === LOAD QUIZ JSON ===
-def load_quiz_json():
-    with open(QUIZ_JSON, "r") as f:
-        return json.load(f)
-
 # === QUIZ PAGE ===
 def quiz_page():
     st.title("🏏 IPL Quiz")
     name = st.text_input("Enter your name")
-
-    df = load_data()
-    if name and name in df["name"].values:
-        st.warning("This name has already been used. Please try a different one.")
-        return
 
     if "quiz_started" not in st.session_state:
         st.session_state.quiz_started = False
@@ -66,32 +54,28 @@ def quiz_page():
         st.session_state.start_time = time.time()
 
     if st.session_state.quiz_started:
-        quiz_data = load_quiz_json()
-        answers = {}
         with st.form("quiz_form"):
-            for i, q in enumerate(quiz_data):
-                answers[i] = st.radio(q["question"], q["options"], key=f"q{i}")
+            q1 = st.radio("Who won IPL 2023?", ["GT", "CSK", "MI"])
+            q2 = st.radio("Who scored most runs in IPL 2023?", ["Shubman Gill", "Virat Kohli", "Ruturaj Gaikwad"])
             submit = st.form_submit_button("Submit")
 
             if submit:
                 end_time = time.time()
                 time_taken = round(end_time - st.session_state.start_time, 2)
-
-                # Calculate score
                 score = 0
-                for i, q in enumerate(quiz_data):
-                    if answers[i] == q["answer"]:
-                        score += 1
+                if q1 == "CSK": score += 1
+                if q2 == "Shubman Gill": score += 1
 
                 ip = get_user_id()
                 insert_score(name, score, ip, time_taken)
 
-                st.success(f"✅ {name}, you scored {score}/{len(quiz_data)}")
+                st.success(f"✅ {name}, you scored {score}/2")
                 st.info(f"⏱️ Time Taken: {time_taken} seconds")
 
                 st.session_state.quiz_started = False
                 st.cache_data.clear()  # Invalidate leaderboard cache
 
+                # Show top leaderboard
                 df = load_data()
                 top_df = df.sort_values(by=["score", "time_taken"], ascending=[False, True]).head(10)
                 st.subheader("🏆 Top 10 Leaderboard")
@@ -129,7 +113,7 @@ def leaderboard_page():
 # === MAIN ===
 def main():
     st.set_page_config(page_title="IPL Quiz", layout="centered")
-    init_db()
+    init_db()  # ensure table exists
 
     choice = st.sidebar.radio("📚 Menu", ["Take Quiz", "Leaderboard"])
     if choice == "Take Quiz":
