@@ -3,6 +3,10 @@ import sqlite3
 import pandas as pd
 import time
 from datetime import datetime
+import smtplib
+import ssl
+import random
+from email.message import EmailMessage
 
 DB_FILE = "quiz.db"
 
@@ -29,6 +33,10 @@ QUESTIONS = [
     {"q": "Which cricketer has played for both CSK and MI?", "options": ["Ambati Rayudu", "Rohit Sharma", "Hardik Pandya"], "answer": "Ambati Rayudu"},
     {"q": "How many foreign players allowed in IPL playing XI?", "options": ["4", "3", "5"], "answer": "4"}
 ]
+
+# === EMAIL CONFIG ===
+SENDER_EMAIL = "your_email@gmail.com"  # Replace with your sender email
+APP_PASSWORD = "your_app_password"     # Replace with your Gmail App Password
 
 # === DB INIT ===
 def init_db():
@@ -59,8 +67,46 @@ def insert_score(name, score, ip, time_taken):
 def get_user_id():
     return st.runtime.scriptrunner.get_script_run_ctx().session_id[-6:]
 
+def send_otp_email(receiver_email, otp_code):
+    msg = EmailMessage()
+    msg.set_content(f"Your OTP for the IPL Quiz is: {otp_code}")
+    msg['Subject'] = "Your IPL Quiz OTP Verification"
+    msg['From'] = SENDER_EMAIL
+    msg['To'] = receiver_email
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as server:
+        server.login(SENDER_EMAIL, APP_PASSWORD)
+        server.send_message(msg)
+
 def quiz_page():
     st.title("\U0001F3CF IPL Mega Quiz")
+
+    email = st.text_input("Enter your Gmail to verify")
+    if "otp_sent" not in st.session_state:
+        st.session_state.otp_sent = False
+        st.session_state.verified = False
+
+    if st.button("Send OTP"):
+        if email and email.endswith("@gmail.com"):
+            st.session_state.generated_otp = str(random.randint(100000, 999999))
+            send_otp_email(email, st.session_state.generated_otp)
+            st.session_state.otp_sent = True
+            st.success("OTP sent to your Gmail!")
+        else:
+            st.error("Please enter a valid Gmail address.")
+
+    if st.session_state.otp_sent and not st.session_state.verified:
+        user_otp = st.text_input("Enter the OTP sent to your Gmail")
+        if user_otp == st.session_state.generated_otp:
+            st.success("✅ Email verified!")
+            st.session_state.verified = True
+        elif user_otp:
+            st.error("Incorrect OTP")
+
+    if not st.session_state.verified:
+        st.stop()
+
     name = st.text_input("Enter your name")
     password = st.text_input("Enter quiz password", type="password")
 
