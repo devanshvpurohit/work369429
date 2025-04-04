@@ -1,33 +1,45 @@
 import streamlit as st
+import sqlite3
 import pandas as pd
 import time
-import os
 from datetime import datetime
-from threading import Lock
 
-EXCEL_FILE = 'quiz_scores.xlsx'
-LOCK = Lock()
+DB_FILE = "quiz.db"
 
-# === UTILITIES ===
-@st.cache_data
+# === DB INIT ===
+def init_db():
+    with sqlite3.connect(DB_FILE) as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS scores (
+                name TEXT,
+                score INTEGER,
+                ip TEXT,
+                time_taken REAL,
+                date TEXT
+            )
+        """)
+        conn.commit()
+
+# === CACHE: LOAD DATA ===
+@st.cache_data(ttl=10)
 def load_data():
-    if os.path.exists(EXCEL_FILE):
-        return pd.read_excel(EXCEL_FILE)
-    else:
-        return pd.DataFrame(columns=["Name", "Score", "IP", "TimeTaken", "Date"])
+    with sqlite3.connect(DB_FILE) as conn:
+        df = pd.read_sql_query("SELECT * FROM scores", conn)
+    return df
 
-def save_data_row(new_row_df):
-    with LOCK:
-        if os.path.exists(EXCEL_FILE):
-            existing_df = pd.read_excel(EXCEL_FILE)
-            full_df = pd.concat([existing_df, new_row_df], ignore_index=True)
-        else:
-            full_df = new_row_df
-        with pd.ExcelWriter(EXCEL_FILE, engine='xlsxwriter') as writer:
-            full_df.to_excel(writer, index=False)
+# === INSERT SINGLE SCORE ===
+def insert_score(name, score, ip, time_taken):
+    date = datetime.now().strftime("%Y-%m-%d")
+    with sqlite3.connect(DB_FILE) as conn:
+        conn.execute(
+            "INSERT INTO scores (name, score, ip, time_taken, date) VALUES (?, ?, ?, ?, ?)",
+            (name, score, ip, time_taken, date)
+        )
+        conn.commit()
 
-def get_client_ip():
-    return st.runtime.scriptrunner.get_script_run_ctx().session_id[-6:]  # pseudonymous unique ID
+# === IP GETTER ===
+def get_user_id():
+    return st.runtime.scriptrunner.get_script_run_ctx().session_id[-6:]
 
 # === QUIZ PAGE ===
 def quiz_page():
@@ -50,26 +62,22 @@ def quiz_page():
             if submit:
                 end_time = time.time()
                 time_taken = round(end_time - st.session_state.start_time, 2)
-
                 score = 0
                 if q1 == "CSK": score += 1
                 if q2 == "Shubman Gill": score += 1
 
-                today = datetime.now().strftime("%Y-%m-%d")
-                ip = get_client_ip()
-
-                new_row = pd.DataFrame([[name, score, ip, time_taken, today]],
-                                       columns=["Name", "Score", "IP", "TimeTaken", "Date"])
-                save_data_row(new_row)
+                ip = get_user_id()
+                insert_score(name, score, ip, time_taken)
 
                 st.success(f"✅ {name}, you scored {score}/2")
                 st.info(f"⏱️ Time Taken: {time_taken} seconds")
 
                 st.session_state.quiz_started = False
+                st.cache_data.clear()  # Invalidate leaderboard cache
 
-                # Show leaderboard preview
+                # Show top leaderboard
                 df = load_data()
-                top_df = df.sort_values(by=["Score", "TimeTaken"], ascending=[False, True]).head(10)
+                top_df = df.sort_values(by=["score", "time_taken"], ascending=[False, True]).head(10)
                 st.subheader("🏆 Top 10 Leaderboard")
                 st.dataframe(top_df.reset_index(drop=True))
 
@@ -79,33 +87,35 @@ def leaderboard_page():
     df = load_data()
 
     if df.empty:
-        st.warning("No quiz attempts yet.")
+        st.warning("No scores recorded yet.")
         return
 
-    filter_date = st.selectbox("📅 Filter by date:", ["All"] + sorted(df["Date"].dropna().unique().tolist()))
+    # Filter
+    filter_date = st.selectbox("📅 Filter by date:", ["All"] + sorted(df["date"].unique()))
     if filter_date != "All":
-        df = df[df["Date"] == filter_date]
+        df = df[df["date"] == filter_date]
 
-    name_filter = st.text_input("🔍 Search name")
+    name_filter = st.text_input("🔍 Search by name")
     if name_filter:
-        df = df[df["Name"].str.contains(name_filter, case=False, na=False)]
+        df = df[df["name"].str.contains(name_filter, case=False, na=False)]
 
     tab1, tab2 = st.tabs(["🏅 Highest Scores", "⚡ Fastest Perfect Scores"])
 
     with tab1:
-        top = df.sort_values(by=["Score", "TimeTaken"], ascending=[False, True]).head(20)
+        top = df.sort_values(by=["score", "time_taken"], ascending=[False, True]).head(20)
         st.dataframe(top.reset_index(drop=True))
 
     with tab2:
-        perfect = df[df["Score"] == df["Score"].max()]
-        fast = perfect.sort_values(by="TimeTaken").head(20)
+        perfect = df[df["score"] == df["score"].max()]
+        fast = perfect.sort_values(by="time_taken").head(20)
         st.dataframe(fast.reset_index(drop=True))
 
-# === MAIN APP ===
+# === MAIN ===
 def main():
     st.set_page_config(page_title="IPL Quiz", layout="centered")
-    choice = st.sidebar.radio("📚 Menu", ["Take Quiz", "Leaderboard"])
+    init_db()  # ensure table exists
 
+    choice = st.sidebar.radio("📚 Menu", ["Take Quiz", "Leaderboard"])
     if choice == "Take Quiz":
         quiz_page()
     else:
