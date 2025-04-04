@@ -1,18 +1,27 @@
 import streamlit as st
-import json
 import time
 import sqlite3
 from datetime import datetime
 from pathlib import Path
 
-# ===== CONFIG =====
+QUIZ_FILE = Path("quiz_data.json")
 DB_PATH = "quiz.db"
-QUIZ_PATH = Path("quiz_data.json")
-MAX_TIME = 30  # seconds per question
+MAX_TIME = 30
 
-st.set_page_config(page_title="🧠 Quiz Master", page_icon="❓", layout="centered")
+st.set_page_config(page_title="🧠 IPL Quiz", page_icon="❓")
 
-# ===== INIT DATABASE =====
+# ===== Read & Write Helpers for quiz_data.json =====
+def read_quiz():
+    if QUIZ_FILE.exists():
+        with QUIZ_FILE.open("r", encoding="utf-8") as f:
+            return eval(f.read())
+    return []
+
+def write_quiz(data):
+    with QUIZ_FILE.open("w", encoding="utf-8") as f:
+        f.write(str(data))
+
+# ===== DB Setup =====
 def init_db():
     with sqlite3.connect(DB_PATH) as conn:
         conn.execute("""
@@ -27,142 +36,142 @@ def init_db():
         conn.commit()
 
 init_db()
+quiz_data = read_quiz()
 
-# ===== LOAD QUIZ =====
-if not QUIZ_PATH.exists():
-    st.error("❌ 'quiz_data.json' not found. Upload it to the app folder.")
-    st.stop()
+# ===== Admin Panel =====
+def admin_panel():
+    st.title("🛠️ Admin Panel")
 
-with QUIZ_PATH.open(encoding="utf-8") as f:
-    quiz_data = json.load(f)
+    # Add Question
+    with st.expander("➕ Add New Question"):
+        question = st.text_input("Question")
+        options = st.text_area("Options (one per line)").splitlines()
+        answer = st.text_input("Correct Answer")
+        info = st.text_area("Extra Info (optional)", "")
 
-# ===== STATE DEFAULTS =====
-defaults = {
-    'name': '',
-    'current_index': 0,
-    'score': 0,
-    'selected_option': None,
-    'answer_submitted': False,
-    'start_time': time.time(),
-    'total_time': 0.0
-}
-for k, v in defaults.items():
-    st.session_state.setdefault(k, v)
+        if st.button("Add Question"):
+            if question and options and answer:
+                quiz_data.append({
+                    "question": question,
+                    "options": options,
+                    "answer": answer,
+                    "information": info
+                })
+                write_quiz(quiz_data)
+                st.success("Question added!")
 
-# ===== SAVE RESULT =====
+    # Delete Question
+    st.subheader("🗑 Existing Questions")
+    for idx, q in enumerate(quiz_data):
+        st.markdown(f"**Q{idx+1}:** {q['question']}")
+        if st.button(f"Delete Q{idx+1}", key=f"del-{idx}"):
+            quiz_data.pop(idx)
+            write_quiz(quiz_data)
+            st.success("Deleted successfully!")
+            st.experimental_rerun()
+
+    # Leaderboard
+    st.subheader("🏆 Leaderboard")
+    with sqlite3.connect(DB_PATH) as conn:
+        rows = conn.execute("""
+            SELECT name, score, total_time, timestamp FROM results
+            ORDER BY score DESC, total_time ASC
+        """).fetchall()
+
+    for i, (name, score, total_time, ts) in enumerate(rows, 1):
+        st.write(f"**{i}. {name}** — 🧠 {score} points ⏱ {total_time}s on {ts}")
+
+# ===== Save Quiz Result =====
 def save_result():
-    try:
-        with sqlite3.connect(DB_PATH) as conn:
-            conn.execute("""
-                INSERT INTO results (name, score, total_time, timestamp, session_id)
-                VALUES (?, ?, ?, ?, ?)
-            """, (
-                st.session_state.name,
-                st.session_state.score,
-                round(st.session_state.total_time, 2),
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                st.session_state.get("session_id", "unknown")
-            ))
-            conn.commit()
-    except Exception as e:
-        st.error(f"Error saving result: {e}")
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute("""
+            INSERT INTO results (name, score, total_time, timestamp, session_id)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            st.session_state.name,
+            st.session_state.score,
+            round(st.session_state.total_time, 2),
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            st.session_state.get("session_id", "unknown")
+        ))
+        conn.commit()
 
-# ===== NAME ENTRY =====
-if not st.session_state.name:
-    st.title("🧠 Welcome to the IPL Quiz")
-    st.subheader("Enter your name to begin")
-    name_input = st.text_input("Name", max_chars=30)
-    if st.button("Start Quiz") and name_input:
-        with sqlite3.connect(DB_PATH) as conn:
-            result = conn.execute("SELECT 1 FROM results WHERE name = ?", (name_input,)).fetchone()
-        if result:
-            st.error("❌ This name has already been used. Try a different one.")
-        else:
-            st.session_state.name = name_input
-            st.session_state.session_id = st.runtime.scriptrunner.get_script_run_ctx().session_id[-6:]
-            st.rerun()
+# ===== Quiz Logic =====
+def run_quiz():
+    st.title("🧠 IPL Quiz")
+    if st.session_state.current_index >= len(quiz_data):
+        st.balloons()
+        st.success(f"✅ You scored {st.session_state.score} / {len(quiz_data)*10}")
+        st.info(f"⏱ Time: {round(st.session_state.total_time, 2)}s")
+        save_result()
+        if st.button("Restart"):
+            for k in st.session_state.keys():
+                del st.session_state[k]
+            st.experimental_rerun()
+        return
 
-# ===== QUIZ COMPLETED =====
-elif st.session_state.current_index >= len(quiz_data):
-    st.balloons()
-    st.title("🎉 Quiz Completed!")
-    st.success(f"Your score: {st.session_state.score} / {len(quiz_data) * 10}")
-    st.info(f"⏱ Total Time: {round(st.session_state.total_time, 2)} seconds")
-    save_result()
-    if st.button("🔁 Restart"):
-        for k in defaults:
-            st.session_state[k] = defaults[k]
-        st.session_state.name = ''
-        st.rerun()
-
-# ===== QUIZ IN PROGRESS =====
-else:
     question = quiz_data[st.session_state.current_index]
     elapsed = round(time.time() - st.session_state.start_time)
     remaining = MAX_TIME - elapsed
-
     if not st.session_state.answer_submitted and remaining <= 0:
-        st.toast("⏱ Time's up! Auto-submitting.")
+        st.toast("⏱ Time's up!")
         st.session_state.answer_submitted = True
 
-    st.title("🧠 IPL Quiz")
-    st.metric("Score", f"{st.session_state.score} / {len(quiz_data)*10}")
-    st.progress((st.session_state.current_index + 1) / len(quiz_data))
-    st.warning(f"⏱ Time Left: {max(0, remaining)} sec")
+    st.metric("Score", f"{st.session_state.score}")
+    st.progress((st.session_state.current_index+1) / len(quiz_data))
+    st.warning(f"⏳ Time Left: {max(0, remaining)}s")
 
-    st.header(f"Question {st.session_state.current_index + 1}")
+    st.header(f"Q{st.session_state.current_index+1}")
     st.subheader(question["question"])
     st.caption(question.get("information", ""))
-    st.markdown("---")
 
-    options = question["options"]
-    answer = question["answer"]
-
-    if st.session_state.answer_submitted:
-        st.markdown("### You selected:")
-        for opt in options:
-            if opt == st.session_state.selected_option:
-                st.info(opt)
-            else:
-                st.write(opt)
-    else:
-        for i, opt in enumerate(options):
-            if st.button(opt, key=f"opt-{i}", use_container_width=True):
+    for i, opt in enumerate(question["options"]):
+        if not st.session_state.answer_submitted:
+            if st.button(opt, key=f"opt-{i}"):
                 st.session_state.selected_option = opt
 
-    st.markdown("---")
+    if st.session_state.answer_submitted:
+        st.markdown(f"✅ Your choice: **{st.session_state.selected_option}**")
 
-    # ===== SUBMIT & NEXT =====
-    def submit_answer():
-        if st.session_state.answer_submitted:
-            return
-        if st.session_state.selected_option == answer:
-            st.session_state.score += 10
-        st.session_state.answer_submitted = True
-        st.session_state.total_time += time.time() - st.session_state.start_time
+    def submit():
+        if not st.session_state.answer_submitted:
+            if st.session_state.selected_option == question["answer"]:
+                st.session_state.score += 10
+            st.session_state.total_time += time.time() - st.session_state.start_time
+            st.session_state.answer_submitted = True
 
-    def next_question():
+    def next_q():
         st.session_state.current_index += 1
         st.session_state.selected_option = None
         st.session_state.answer_submitted = False
         st.session_state.start_time = time.time()
 
     if st.session_state.answer_submitted:
-        if st.session_state.current_index < len(quiz_data) - 1:
-            st.button("➡️ Next", on_click=next_question)
-        else:
-            st.button("✅ Finish", on_click=next_question)
+        st.button("➡️ Next", on_click=next_q)
     else:
-        st.button("🚀 Submit", on_click=submit_answer)
+        st.button("🚀 Submit", on_click=submit)
 
-# ===== CUSTOM STYLING =====
-st.markdown("""
-<style>
-div.stButton > button {
-    margin: 4px auto;
-    width: 100%;
-    font-size: 16px;
-    border-radius: 12px;
-}
-</style>
-""", unsafe_allow_html=True)
+# ===== Main Login =====
+if "name" not in st.session_state:
+    st.session_state.name = ""
+    st.session_state.current_index = 0
+    st.session_state.score = 0
+    st.session_state.selected_option = None
+    st.session_state.answer_submitted = False
+    st.session_state.start_time = time.time()
+    st.session_state.total_time = 0.0
+
+st.title("🔐 IPL Quiz Platform")
+
+if not st.session_state.name:
+    name = st.text_input("Enter your name to start")
+    if st.button("Enter"):
+        if name:
+            st.session_state.name = name
+            st.session_state.session_id = st.runtime.scriptrunner.get_script_run_ctx().session_id[-6:]
+            st.experimental_rerun()
+
+elif st.session_state.name == "ecell_696969":
+    admin_panel()
+else:
+    run_quiz()
