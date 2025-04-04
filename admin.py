@@ -4,6 +4,7 @@ import time
 import sqlite3
 from datetime import datetime
 from pathlib import Path
+import socket
 
 DB_PATH = "quiz.db"
 QUIZ_PATH = Path("quiz_data.json")
@@ -21,10 +22,19 @@ def init_db():
                 score INTEGER,
                 total_time REAL,
                 timestamp TEXT,
-                session_id TEXT
+                session_id TEXT,
+                ip_address TEXT
             )
         """)
         conn.commit()
+
+# ===== GET IP ADDRESS =====
+def get_ip():
+    try:
+        hostname = socket.gethostname()
+        return socket.gethostbyname(hostname)
+    except:
+        return "unknown"
 
 # ===== LOAD QUIZ =====
 if not QUIZ_PATH.exists():
@@ -42,7 +52,8 @@ defaults = {
     'selected_option': None,
     'answer_submitted': False,
     'start_time': time.time(),
-    'total_time': 0.0
+    'total_time': 0.0,
+    'ip_address': get_ip()
 }
 for k, v in defaults.items():
     st.session_state.setdefault(k, v)
@@ -51,14 +62,15 @@ for k, v in defaults.items():
 def save_result():
     with sqlite3.connect(DB_PATH) as conn:
         conn.execute("""
-            INSERT INTO results (name, score, total_time, timestamp, session_id)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO results (name, score, total_time, timestamp, session_id, ip_address)
+            VALUES (?, ?, ?, ?, ?, ?)
         """, (
             st.session_state.name,
             st.session_state.score,
             round(st.session_state.total_time, 2),
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            st.session_state.get("session_id", "unknown")
+            st.session_state.get("session_id", "unknown"),
+            st.session_state.ip_address
         ))
         conn.commit()
 
@@ -69,9 +81,12 @@ if not st.session_state.name:
     name_input = st.text_input("Name", max_chars=30)
     if st.button("Start Quiz") and name_input:
         with sqlite3.connect(DB_PATH) as conn:
-            result = conn.execute("SELECT 1 FROM results WHERE name = ?", (name_input,)).fetchone()
+            result = conn.execute("""
+                SELECT 1 FROM results 
+                WHERE name = ? OR ip_address = ?
+            """, (name_input, st.session_state.ip_address)).fetchone()
         if result:
-            st.error("❌ This name has already been used. Try a different one.")
+            st.error("❌ You have already participated from this IP or name.")
         else:
             st.session_state.name = name_input
             st.session_state.session_id = st.runtime.scriptrunner.get_script_run_ctx().session_id[-6:]
@@ -84,6 +99,18 @@ elif st.session_state.current_index >= len(quiz_data):
     st.success(f"Your score: {st.session_state.score} / {len(quiz_data) * 10}")
     st.info(f"⏱ Total Time: {round(st.session_state.total_time, 2)} seconds")
     save_result()
+
+    st.subheader("🏆 Leaderboard (Top 10)")
+    with sqlite3.connect(DB_PATH) as conn:
+        leaderboard = conn.execute("""
+            SELECT name, score, total_time FROM results 
+            ORDER BY score DESC, total_time ASC 
+            LIMIT 10
+        """).fetchall()
+
+    for i, (n, s, t) in enumerate(leaderboard, 1):
+        st.write(f"{i}. **{n}** — {s} pts in {t:.2f}s")
+
     if st.button("🔁 Restart"):
         for k in defaults:
             st.session_state[k] = defaults[k]
@@ -102,7 +129,7 @@ else:
     st.title("🧠 IPL Quiz")
     st.metric("Score", f"{st.session_state.score} / {len(quiz_data)*10}")
     st.progress((st.session_state.current_index + 1) / len(quiz_data))
-    st.warning(f"⏱ Time Left: {max(0, remaining)} sec")
+    st.success(f"⏱ Time Left: {max(0, remaining)} sec")
 
     st.header(f"Question {st.session_state.current_index + 1}")
     st.subheader(question["question"])
@@ -113,15 +140,7 @@ else:
     options = question["options"]
     answer = question["answer"]
 
-    if st.session_state.answer_submitted:
-        for opt in options:
-            if opt == answer:
-                st.success(f"✅ {opt}")
-            elif opt == st.session_state.selected_option:
-                st.error(f"❌ {opt}")
-            else:
-                st.write(opt)
-    else:
+    if not st.session_state.answer_submitted:
         for i, opt in enumerate(options):
             if st.button(opt, key=f"opt-{i}", use_container_width=True):
                 st.session_state.selected_option = opt
@@ -152,7 +171,7 @@ else:
 # ===== INIT DB ON LOAD =====
 init_db()
 
-# ===== CUSTOM STYLING =====
+# ===== CUSTOM GREEN STYLING =====
 st.markdown("""
 <style>
 div.stButton > button {
@@ -160,7 +179,15 @@ div.stButton > button {
     width: 100%;
     font-size: 16px;
     border-radius: 12px;
+    background-color: #00aa00 !important;
+    color: white !important;
+    border: none;
+}
+.stProgress > div > div > div {
+    background-color: #00cc00;
+}
+.stMetric label, .stMetric div {
+    color: #006600 !important;
 }
 </style>
 """, unsafe_allow_html=True)
-
