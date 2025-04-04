@@ -1,125 +1,112 @@
 import streamlit as st
-import sqlite3
-import pandas as pd
+import json
+from pathlib import Path
 import time
-from datetime import datetime
 
-DB_FILE = "quiz.db"
+# ==== App Setup ====
+st.set_page_config(page_title="🧠 Quiz Master", page_icon="❓", layout="centered")
 
-# === DB INIT ===
-def init_db():
-    with sqlite3.connect(DB_FILE) as conn:
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS scores (
-                name TEXT,
-                score INTEGER,
-                ip TEXT,
-                time_taken REAL,
-                date TEXT
-            )
-        """)
-        conn.commit()
+# ==== Load Quiz Data ====
+QUIZ_PATH = Path("content/quiz_data.json")
+quiz_data = json.loads(QUIZ_PATH.read_text(encoding="utf-8"))
 
-# === CACHE: LOAD DATA ===
-@st.cache_data(ttl=10)
-def load_data():
-    with sqlite3.connect(DB_FILE) as conn:
-        df = pd.read_sql_query("SELECT * FROM scores", conn)
-    return df
+# ==== Initialize State ====
+default_values = {
+    'current_index': 0,
+    'score': 0,
+    'selected_option': None,
+    'answer_submitted': False,
+    'start_time': time.time()
+}
+for key, val in default_values.items():
+    st.session_state.setdefault(key, val)
 
-# === INSERT SINGLE SCORE ===
-def insert_score(name, score, ip, time_taken):
-    date = datetime.now().strftime("%Y-%m-%d")
-    with sqlite3.connect(DB_FILE) as conn:
-        conn.execute(
-            "INSERT INTO scores (name, score, ip, time_taken, date) VALUES (?, ?, ?, ?, ?)",
-            (name, score, ip, time_taken, date)
-        )
-        conn.commit()
+def restart_quiz():
+    for key in default_values:
+        st.session_state[key] = default_values[key]
 
-# === IP GETTER ===
-def get_user_id():
-    return st.runtime.scriptrunner.get_script_run_ctx().session_id[-6:]
+def submit_answer(auto=False):
+    st.session_state.answer_submitted = True
+    if st.session_state.selected_option == quiz_data[st.session_state.current_index]['answer']:
+        st.session_state.score += 10
+    if auto:
+        st.toast("⏳ Time's up! Auto-submitted.", icon="⏰")
 
-# === QUIZ PAGE ===
-def quiz_page():
-    st.title("🏏 IPL Quiz")
-    name = st.text_input("Enter your name")
+def next_question():
+    st.session_state.current_index += 1
+    st.session_state.selected_option = None
+    st.session_state.answer_submitted = False
+    st.session_state.start_time = time.time()
 
-    if "quiz_started" not in st.session_state:
-        st.session_state.quiz_started = False
+# ==== Current Question ====
+if st.session_state.current_index >= len(quiz_data):
+    st.balloons()
+    st.title("🎉 Quiz Completed!")
+    st.success(f"Your final score is {st.session_state.score} / {len(quiz_data) * 10}")
+    if st.button("🔁 Restart Quiz"):
+        restart_quiz()
+    st.stop()
 
-    if st.button("Start Quiz") and name:
-        st.session_state.quiz_started = True
-        st.session_state.start_time = time.time()
+question = quiz_data[st.session_state.current_index]
+elapsed = round(time.time() - st.session_state.start_time)
+remaining = 30 - elapsed
 
-    if st.session_state.quiz_started:
-        with st.form("quiz_form"):
-            q1 = st.radio("Who won IPL 2023?", ["GT", "CSK", "MI"])
-            q2 = st.radio("Who scored most runs in IPL 2023?", ["Shubman Gill", "Virat Kohli", "Ruturaj Gaikwad"])
-            submit = st.form_submit_button("Submit")
+# ==== Timer Handling ====
+if not st.session_state.answer_submitted:
+    if remaining <= 0:
+        submit_answer(auto=True)
+        time.sleep(1)  # Small delay to avoid flicker
+        st.experimental_rerun()
 
-            if submit:
-                end_time = time.time()
-                time_taken = round(end_time - st.session_state.start_time, 2)
-                score = 0
-                if q1 == "CSK": score += 1
-                if q2 == "Shubman Gill": score += 1
+# ==== UI Layout ====
+st.title("🧠 Streamlit Quiz")
+st.metric("Score", f"{st.session_state.score} / {len(quiz_data)*10}")
+st.progress((st.session_state.current_index + 1) / len(quiz_data))
 
-                ip = get_user_id()
-                insert_score(name, score, ip, time_taken)
+st.header(f"Question {st.session_state.current_index + 1}")
+st.subheader(question["question"])
+st.caption(question.get("information", ""))
+st.markdown("---")
 
-                st.success(f"✅ {name}, you scored {score}/2")
-                st.info(f"⏱️ Time Taken: {time_taken} seconds")
+# ==== Countdown Timer ====
+st.warning(f"⏱ Time Left: {max(0, remaining)} seconds")
 
-                st.session_state.quiz_started = False
-                st.cache_data.clear()  # Invalidate leaderboard cache
+# ==== Answer Logic ====
+options = question["options"]
+correct_answer = question["answer"]
 
-                # Show top leaderboard
-                df = load_data()
-                top_df = df.sort_values(by=["score", "time_taken"], ascending=[False, True]).head(10)
-                st.subheader("🏆 Top 10 Leaderboard")
-                st.dataframe(top_df.reset_index(drop=True))
+if st.session_state.answer_submitted:
+    for option in options:
+        if option == correct_answer:
+            st.success(f"✅ {option}")
+        elif option == st.session_state.selected_option:
+            st.error(f"❌ {option}")
+        else:
+            st.write(option)
+else:
+    for i, option in enumerate(options):
+        if st.button(option, key=f"opt-{i}", use_container_width=True):
+            st.session_state.selected_option = option
 
-# === LEADERBOARD PAGE ===
-def leaderboard_page():
-    st.title("📊 Public Leaderboard")
-    df = load_data()
+st.markdown("---")
 
-    if df.empty:
-        st.warning("No scores recorded yet.")
-        return
-
-    # Filter
-    filter_date = st.selectbox("📅 Filter by date:", ["All"] + sorted(df["date"].unique()))
-    if filter_date != "All":
-        df = df[df["date"] == filter_date]
-
-    name_filter = st.text_input("🔍 Search by name")
-    if name_filter:
-        df = df[df["name"].str.contains(name_filter, case=False, na=False)]
-
-    tab1, tab2 = st.tabs(["🏅 Highest Scores", "⚡ Fastest Perfect Scores"])
-
-    with tab1:
-        top = df.sort_values(by=["score", "time_taken"], ascending=[False, True]).head(20)
-        st.dataframe(top.reset_index(drop=True))
-
-    with tab2:
-        perfect = df[df["score"] == df["score"].max()]
-        fast = perfect.sort_values(by="time_taken").head(20)
-        st.dataframe(fast.reset_index(drop=True))
-
-# === MAIN ===
-def main():
-    st.set_page_config(page_title="IPL Quiz", layout="centered")
-    init_db()  # ensure table exists
-
-    choice = st.sidebar.radio("📚 Menu", ["Take Quiz", "Leaderboard"])
-    if choice == "Take Quiz":
-        quiz_page()
+# ==== Navigation Buttons ====
+if st.session_state.answer_submitted:
+    if st.session_state.current_index < len(quiz_data) - 1:
+        st.button("➡️ Next", on_click=next_question)
     else:
-        leaderboard_page()
+        st.button("✅ Finish", on_click=next_question)
+else:
+    st.button("🚀 Submit", on_click=submit_answer)
 
-if __name__ == "__main__":
-    main()
+# ==== Custom CSS ====
+st.markdown("""
+<style>
+div.stButton > button {
+    margin: 5px auto;
+    width: 100%;
+    font-size: 18px;
+    border-radius: 12px;
+}
+</style>
+""", unsafe_allow_html=True)
