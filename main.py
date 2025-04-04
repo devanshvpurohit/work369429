@@ -22,14 +22,20 @@ def init_db():
         """)
         conn.commit()
 
-# === CACHE: LOAD DATA ===
+# === LOAD QUIZ QUESTIONS WITHOUT json IMPORT ===
+def load_quiz_data():
+    path = Path(__file__).parent / "quiz_data.json"
+    with open(path, "r") as f:
+        return ast.literal_eval(f.read())
+
+# === CACHE: LOAD SCORES FROM DB ===
 @st.cache_data(ttl=10)
 def load_data():
     with sqlite3.connect(DB_FILE) as conn:
         df = pd.read_sql_query("SELECT * FROM scores", conn)
     return df
 
-# === INSERT SINGLE SCORE ===
+# === INSERT NEW SCORE ===
 def insert_score(name, score, ip, time_taken):
     date = datetime.now().strftime("%Y-%m-%d")
     with sqlite3.connect(DB_FILE) as conn:
@@ -39,20 +45,22 @@ def insert_score(name, score, ip, time_taken):
         )
         conn.commit()
 
-# === IP GETTER ===
+# === GET SESSION-BASED ID FOR USER ===
 def get_user_id():
     return st.runtime.scriptrunner.get_script_run_ctx().session_id[-6:]
-
-# === LOAD QUIZ DATA ===
-def load_quiz_data():
-    file_path = Path(__file__).parent / "quiz_data.json"
-    with open(file_path, "r") as f:
-        return ast.literal_eval(f.read())
 
 # === QUIZ PAGE ===
 def quiz_page():
     st.title("🏏 IPL Quiz")
     name = st.text_input("Enter your name")
+
+    ip = get_user_id()
+    df = load_data()
+    already_played = not df[(df["name"] == name) & (df["ip"] == ip)].empty
+
+    if already_played:
+        st.warning("🚫 You have already attempted the quiz with this name and device.")
+        return
 
     if "quiz_started" not in st.session_state:
         st.session_state.quiz_started = False
@@ -76,7 +84,6 @@ def quiz_page():
                 time_taken = round(end_time - st.session_state.start_time, 2)
                 score = sum(1 for correct, given in responses if correct == given)
 
-                ip = get_user_id()
                 insert_score(name, score, ip, time_taken)
 
                 st.success(f"✅ {name}, you scored {score}/{len(responses)}")
@@ -85,13 +92,11 @@ def quiz_page():
                 st.session_state.quiz_started = False
                 st.cache_data.clear()
 
-                # === Real-time Leaderboard ===
+                # Leaderboard preview
                 df = load_data()
-                leaderboard = df.sort_values(by=["score", "time_taken"], ascending=[False, True]).head(10)
-                leaderboard = leaderboard[["name", "score", "ip", "time_taken"]]
-
+                top10 = df.sort_values(by=["score", "time_taken"], ascending=[False, True]).head(10)
                 st.subheader("🏆 Real-Time Top 10 Leaderboard")
-                st.dataframe(leaderboard.reset_index(drop=True), use_container_width=True)
+                st.dataframe(top10[["name", "score", "ip", "time_taken"]].reset_index(drop=True), use_container_width=True)
 
 # === LEADERBOARD PAGE ===
 def leaderboard_page():
@@ -99,10 +104,10 @@ def leaderboard_page():
     df = load_data()
 
     if df.empty:
-        st.warning("No scores recorded yet.")
+        st.warning("No scores yet.")
         return
 
-    filter_date = st.selectbox("📅 Filter by date:", ["All"] + sorted(df["date"].unique()))
+    filter_date = st.selectbox("📅 Filter by date", ["All"] + sorted(df["date"].unique()))
     if filter_date != "All":
         df = df[df["date"] == filter_date]
 
