@@ -23,7 +23,7 @@ def init_db():
         """)
         conn.commit()
 
-# === LOAD QUIZ QUESTIONS WITHOUT json IMPORT ===
+# === LOAD QUIZ QUESTIONS ===
 def load_quiz_data():
     path = Path(__file__).parent / "quiz_data.json"
     with open(path, "r") as f:
@@ -53,18 +53,17 @@ def get_user_id():
 # === QUIZ PAGE ===
 def quiz_page():
     st.title("🏏 IPL Quiz")
-
     name = st.text_input("Enter your name to begin")
     ip = get_user_id()
     df = load_data()
+
+    if "quiz_started" not in st.session_state:
+        st.session_state.quiz_started = False
 
     already_played = not df[(df["name"] == name) & (df["ip"] == ip)].empty
     if already_played:
         st.warning("🚫 You have already attempted the quiz with this name and device.")
         return
-
-    if "quiz_started" not in st.session_state:
-        st.session_state.quiz_started = False
 
     if not st.session_state.quiz_started and name:
         if st.button("Start Quiz"):
@@ -78,12 +77,14 @@ def quiz_page():
             st.session_state.responses = []
             st.session_state.current_question = 0
             st.session_state.question_start_time = time.time()
+            st.experimental_rerun()
 
     if st.session_state.quiz_started:
-        quiz_data = st.session_state.quiz_data
         q_idx = st.session_state.current_question
+        quiz_data = st.session_state.quiz_data
 
         if q_idx >= len(quiz_data):
+            # Quiz finished
             end_time = time.time()
             total_time = round(end_time - st.session_state.start_time, 2)
             score = sum(1 for correct, given in st.session_state.responses if correct == given)
@@ -92,6 +93,8 @@ def quiz_page():
             st.info(f"⏱ Total Time Taken: {total_time} seconds")
             st.session_state.quiz_started = False
             st.cache_data.clear()
+
+            # Leaderboard preview
             df = load_data()
             top10 = df.sort_values(by=["score", "time_taken"], ascending=[False, True]).head(10)
             st.subheader("🏆 Real-Time Top 10 Leaderboard")
@@ -102,21 +105,24 @@ def quiz_page():
         elapsed = time.time() - st.session_state.question_start_time
         remaining = int(30 - elapsed)
 
-        st.subheader(f"Question {q_idx + 1} / {len(quiz_data)}")
-        st.write(f"⏳ Time remaining: {remaining} seconds")
-
         if remaining <= 0:
+            # Time up, auto skip
             st.session_state.responses.append((question["answer"], "Skipped"))
             st.session_state.current_question += 1
             st.session_state.question_start_time = time.time()
-        else:
-            with st.form(key=f"form_q{q_idx}"):
-                response = st.radio(question["question"], question["options"], key=f"q{q_idx}")
-                submitted = st.form_submit_button("Submit")
-                if submitted:
-                    st.session_state.responses.append((question["answer"], response))
-                    st.session_state.current_question += 1
-                    st.session_state.question_start_time = time.time()
+            st.experimental_rerun()
+
+        st.subheader(f"Question {q_idx + 1} / {len(quiz_data)}")
+        st.write(f"⏳ Time remaining: {remaining} seconds")
+
+        with st.form(f"form_q{q_idx}"):
+            response = st.radio(question["question"], question["options"], key=f"q{q_idx}")
+            submit = st.form_submit_button("Submit")
+            if submit:
+                st.session_state.responses.append((question["answer"], response))
+                st.session_state.current_question += 1
+                st.session_state.question_start_time = time.time()
+                st.experimental_rerun()
 
 # === LEADERBOARD PAGE ===
 def leaderboard_page():
@@ -135,7 +141,6 @@ def leaderboard_page():
     if name_filter:
         df = df[df["name"].str.contains(name_filter, case=False, na=False)]
 
-    # Download CSV
     if not df.empty:
         csv = df.to_csv(index=False).encode("utf-8")
         st.download_button("⬇️ Download CSV", csv, "quiz_results.csv", "text/csv")
@@ -157,8 +162,8 @@ def main():
     init_db()
     st.session_state.user_id = get_user_id()
 
-    choice = st.sidebar.radio("📚 Menu", ["Take Quiz", "Leaderboard"])
-    if choice == "Take Quiz":
+    menu = st.sidebar.radio("📚 Menu", ["Take Quiz", "Leaderboard"])
+    if menu == "Take Quiz":
         quiz_page()
     else:
         leaderboard_page()
