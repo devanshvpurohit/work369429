@@ -46,6 +46,26 @@ def get_user_id():
     return st.session_state.get("user_id", str(time.time())[-6:])
 
 def quiz_page():
+    st.markdown("""
+        <style>
+            .main, .block-container {
+                padding-top: 0rem !important;
+                padding-bottom: 0rem !important;
+            }
+            body, .stApp {
+                background-color: #e6ffe6;
+            }
+            .stButton>button {
+                background-color: #00cc44;
+                color: white;
+                font-weight: bold;
+            }
+            .stRadio>div>label {
+                color: #006622;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
     st.title("\U0001F3CF IPL Quiz")
     name = st.text_input("Enter your name to begin")
     ip = get_user_id()
@@ -99,7 +119,7 @@ def quiz_page():
         elapsed = time.time() - st.session_state.question_start_time
         remaining = max(0, int(30 - elapsed))
         st.subheader(f"Question {q_idx + 1} of {len(questions)}")
-        st.write(f"\u23F3 Time remaining: {remaining} seconds")
+        st.markdown(f"<h4 style='color:green;'>\u23F3 Time remaining: {remaining} seconds</h4>", unsafe_allow_html=True)
 
         with st.form(key=f"form_q{q_idx}"):
             response = st.radio(question["question"], question["options"], key=f"q{q_idx}")
@@ -110,6 +130,12 @@ def quiz_page():
                 st.session_state.current_question += 1
                 st.session_state.question_start_time = time.time()
 
+        with st.expander("\U0001F4CA Live Poll Results"):
+            poll_results = {opt: 0 for opt in question["options"]}
+            for _, given in st.session_state.responses:
+                if given in poll_results:
+                    poll_results[given] += 1
+            st.bar_chart(poll_results)
 
 def leaderboard_page():
     st.title("\U0001F4CA Public Leaderboard")
@@ -142,7 +168,7 @@ def leaderboard_page():
         st.dataframe(fast[["name", "score", "ip", "time_taken"]].reset_index(drop=True), use_container_width=True)
 
 def main():
-    st.set_page_config(page_title="IPL Quiz", layout="centered")
+    st.set_page_config(page_title="IPL Quiz", layout="wide")
     init_db()
     st.session_state.user_id = get_user_id()
 
