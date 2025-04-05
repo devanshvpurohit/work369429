@@ -1,552 +1,62 @@
-
-  {
-    "question": "Who holds the record for the most runs in IPL history?",
-    "options": ["Rohit Sharma", "Virat Kohli", "Shikhar Dhawan", "David Warner"],
-    "answer": "Virat Kohli",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Who holds the record for the most wickets in IPL history?",
-    "options": ["Dwayne Bravo", "Yuzvendra Chahal", "Piyush Chawla", "Bhuvneshwar Kumar"],
-    "answer": "Yuzvendra Chahal",
-    "difficulty": "medium"
-  },
-  {
-    "question": "What is the highest individual score in IPL history?",
-    "options": ["AB de Villiers – 133*", "Chris Gayle – 175*", "Quinton de Kock – 140*", "Brendon McCullum – 158*"],
-    "answer": "Chris Gayle – 175*",
-    "difficulty": "easy"
-  },
-  {
-    "question": "What is the highest score by Sunrisers Hyderabad (SRH) in an IPL innings?",
-    "options": ["277/3", "286/6", "287/3", "263/5"],
-    "answer": "287/3",
-    "difficulty": "medium"
-  },
-  {
-    "question": "How many teams didn't win any of the IPL seasons till now?",
-    "options": ["4", "1", "3", "2"],
-    "answer": "4",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Who holds the record for the best bowling figures in an IPL match?",
-    "options": ["Adam Zampa – 6/19", "Alzarri Joseph – 6/12", "Anil Kumble – 5/5", "Sohail Tanvir – 6/14"],
-    "answer": "Alzarri Joseph – 6/12",
-    "difficulty": "hard"
-  },
-  {
-    "question": "Who holds the record for the fastest century in IPL history?",
-    "options": ["Chris Gayle – 30 balls", "Yusuf Pathan – 37 balls", "Travis Head – 39 balls", "David Miller – 38 balls"],
-    "answer": "Chris Gayle – 30 balls",
-    "difficulty": "medium"
-  },
-  {
-    "question": "When was the first IPL match played?",
-    "options": ["KINGS 11 PUNJAB VS RR", "DC VS DD", "RCB VS KKR – April 18, 2008", "MI VS CSK"],
-    "answer": "RCB VS KKR – April 18, 2008",
-    "difficulty": "hard"
-  },
-  {
-    "question": "Who has hit the most sixes in IPL history?",
-    "options": ["MS Dhoni – 252 sixes", "Virat Kohli – 276 sixes", "Rohit Sharma – 281 sixes", "Chris Gayle – 357 sixes"],
-    "answer": "Chris Gayle – 357 sixes",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Who holds the record for the longest six in IPL history?",
-    "options": ["Robin Uthappa – 120 meters", "Albie Morkel – 125 meters", "Adam Gilchrist – 122 meters", "Praveen Kumar – 124 meters"],
-    "answer": "Albie Morkel – 125 meters",
-    "difficulty": "hard"
-  },
-  {
-    "question": "Which team holds the record for the lowest total in IPL history?",
-    "options": ["Rajasthan Royals – 58 all out", "Kolkata Knight Riders – 67 all out", "Delhi Capitals – 66 all out", "Royal Challengers Bengaluru – 49 all out"],
-    "answer": "Royal Challengers Bengaluru – 49 all out",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which team holds the record for the highest successful run chase in IPL history?",
-    "options": ["Mumbai Indians – 219/6", "Rajasthan Royals – 226/6", "Kolkata Knight Riders – 224/8", "Punjab Kings – 262/2"],
-    "answer": "Punjab Kings – 262/2",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Who bowled the fastest delivery in IPL history?",
-    "options": ["Shaun Tait – 157.71 km/h", "Mayank Yadav – 156.7 km/h", "Anrich Nortje – 156.22 km/h", "Umran Malik – 157 km/h"],
-    "answer": "Shaun Tait – 157.71 km/h",
-    "difficulty": "hard"
-  },
-  {
-    "question": "Which team has won the most IPL titles?",
-    "options": ["Chennai Super Kings", "Mumbai Indians", "Kolkata Knight Riders", "Rajasthan Royals"],
-    "answer": "Mumbai Indians",
-    "difficulty": "easy"
-  },
-  {
-    "question": "In which year was the 'Super Over' first introduced in the IPL?",
-    "options": ["2008", "2009", "2010", "2011"],
-    "answer": "2009",
-    "difficulty": "hard"
-  },
-  {
-    "question": "Who was the first Indian player to score a century in IPL history?",
-    "options": ["Virat Kohli", "Manish Pandey", "Rohit Sharma", "Suresh Raina"],
-    "answer": "Manish Pandey",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which IPL team was previously known as the Deccan Chargers?",
-    "options": ["Sunrisers Hyderabad", "Delhi Capitals", "Rajasthan Royals", "Gujarat Titans"],
-    "answer": "Sunrisers Hyderabad",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which player has taken the most catches in IPL history?",
-    "options": ["Kieron Pollard", "Suresh Raina", "AB de Villiers", "Rohit Sharma"],
-    "answer": "Suresh Raina",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Who won the emerging player of the year in IPL 2023?",
-    "options": ["Nitish Kumar Reddy", "Rinku Singh", "Tilak Varma", "Sai Sudharsan"],
-    "answer": "Nitish Kumar Reddy",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which IPL team plays its home matches at the Wankhede Stadium?",
-    "options": ["Chennai Super Kings", "Mumbai Indians", "Royal Challengers Bengaluru", "Delhi Capitals"],
-    "answer": "Mumbai Indians",
-    "difficulty": "easy"
-  },
-  {
-    "question": "What is the record for most ducks in IPL history?",
-    "options": ["Rohit Sharma", "Virat Kohli", "Gautam Gambhir", "Ajinkya Rahane"],
-    "answer": "Rohit Sharma",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Who was the captain of the Rajasthan Royals when they won the inaugural IPL season?",
-    "options": ["Shane Watson", "Graeme Smith", "Shane Warne", "Younis Khan"],
-    "answer": "Shane Warne",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Who won the IPL fair play award in the 2023 season?",
-    "options": ["Gujarat Titans", "Sunrisers Hyderabad", "Rajasthan Royals", "Chennai Super Kings"],
-    "answer": "Sunrisers Hyderabad",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which IPL team played the most number of play off matches?",
-    "options": ["Mumbai Indians", "Chennai Super Kings", "Kolkata Knight Riders", "Royal Challengers Bengaluru"],
-    "answer": "Chennai Super Kings",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which stadium has hosted the most IPL finals?",
-    "options": ["M. Chinnaswamy Stadium, Bengaluru", "Wankhede Stadium, Mumbai", "Eden Gardens, Kolkata", "MA Chidambaram Stadium, Chennai"],
-    "answer": "Wankhede Stadium, Mumbai",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which player won the 'Most Valuable Player' award in the inaugural IPL season?",
-    "options": ["Shane Watson", "Sohail Tanvir", "Yusuf Pathan", "Gautam Gambhir"],
-    "answer": "Shane Watson",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which player won the man of the match award in the first IPL finals?",
-    "options": ["Rohit Sharma", "MS Dhoni", "Yusuf Pathan", "Suresh Raina"],
-    "answer": "Yusuf Pathan",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which IPL season had the most number of teams participating?",
-    "options": ["2011", "2008", "2020", "2019"],
-    "answer": "2011",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which team used the slogan 'Korbo, Lorbo, Jeetbo Re'?",
-    "options": ["Delhi Capitals", "Rajasthan Royals", "Kolkata Knight Riders", "Sunrisers Hyderabad"],
-    "answer": "Kolkata Knight Riders",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which bowler has bowled the most maiden overs in IPL history?",
-    "options": ["Lasith Malinga", "Praveen Kumar", "Bhuvneshwar Kumar", "Jasprit Bumrah"],
-    "answer": "Praveen Kumar",
-    "difficulty": "medium"
-  },
-  {
-    "question": "What was the name of the team who won the IPL in 2009?",
-    "options": ["Gujarat Lions", "Pune Warriors India", "Deccan Chargers", "Kochi Tuskers Kerala"],
-    "answer": "Deccan Chargers",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which player has faced the most deliveries in IPL history?",
-    "options": ["David Warner", "Rohit Sharma", "Shikhar Dhawan", "Virat Kohli"],
-    "answer": "Virat Kohli",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Who won the 2016 IPL final man of the match?",
-    "options": ["Virat Kohli", "Ben Cutting", "David Warner", "Chris Gayle"],
-    "answer": "Ben Cutting",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Who had the best bowling economy in an IPL season (min 10 innings)?",
-    "options": ["Sunil Narine 6.00 in 2012", "Rashid Khan 6.13 in 2017", "Anrich Nortje 6.16 in 2020", "Sunil Narine 5.47 in 2014"],
-    "answer": "Sunil Narine 5.47 in 2014",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which Indian Umpire has officiated the most IPL games?",
-    "options": ["Sundaram Ravi", "Shivshankar Pappu Rajesh", "Anil Chaudhary", "Nitin Menon"],
-    "answer": "Shivshankar Pappu Rajesh",
-    "difficulty": "medium"
-  }
-
-  // ... existing questions ...
-  {
-    "question": "Which player has the highest strike rate in an IPL innings (min 50 runs)?",
-    "options": ["Pat Cummins", "Andre Russel", "Liam Livingstone", "Kieron Pollard"],
-    "answer": "Pat Cummins",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which player has the most player of the tournament awards?",
-    "options": ["Virat Kohli", "Andre Russel", "Shane Watson", "David Warner"],
-    "answer": "Shane Watson",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which team has used the slogan 'Play Bold'?",
-    "options": ["Rajasthan Royals", "Royal Challengers Bengaluru", "Delhi Capitals", "Punjab Kings"],
-    "answer": "Royal Challengers Bengaluru",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which player has the most four wicket hauls in IPL history?",
-    "options": ["Jasprit Bumrah", "Lasith Malinga", "Sunil Narine", "Yuzvendra Chahal"],
-    "answer": "Sunil Narine",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which team was initially owned by Vijay Mallya?",
-    "options": ["Mumbai Indians", "Chennai Super Kings", "Royal Challengers Bengaluru", "Punjab Kings"],
-    "answer": "Royal Challengers Bengaluru",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which IPL team has the least number of wins in IPL history?",
-    "options": ["Delhi Capitals", "Punjab Kings", "Deccan Chargers/Sunrisers Hyderabad", "Pune Warriors India/Rising Pune Super Giants"],
-    "answer": "Pune Warriors India/Rising Pune Super Giants",
-    "difficulty": "medium"
-  },
-  {
-    "question": "How many super overs took place in IPL 2020?",
-    "options": ["3", "5", "2", "4"],
-    "answer": "5",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Who was the oldest player to play an IPL match?",
-    "options": ["Brad Hogg", "Pravin Tambe", "Muttiah Muralitharan", "Imran Tahir"],
-    "answer": "Pravin Tambe",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Who got awarded the most number of maximum sixes awards in an IPL season?",
-    "options": ["Andre Russell", "Chris Gayle", "Kieron Pollard", "David Warner"],
-    "answer": "Chris Gayle",
-    "difficulty": "easy"
-  },
-  {
-    "question": "How many times has Mumbai Indians made the IPL final?",
-    "options": ["7", "6", "5", "8"],
-    "answer": "6",
-    "difficulty": "medium"
-  },
-  {
-    "question": "In which IPL season were 10 teams included?",
-    "options": ["2010", "2011", "2022", "2023"],
-    "answer": "2011",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Who was the most expensive player in the first IPL Auction?",
-    "options": ["MS Dhoni", "Yuvraj Singh", "Andrew Symonds", "Ricky Ponting"],
-    "answer": "MS Dhoni",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which player was named most valuable player in the 2022 IPL season?",
-    "options": ["David Warner", "Jos Buttler", "Hardik Pandya", "Rashid Khan"],
-    "answer": "Jos Buttler",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which IPL franchise has the most consecutive losses?",
-    "options": ["Delhi Daredevils(Delhi Capitals)", "Pune Warriors India", "Royal Challengers Bengaluru", "Deccan Chargers"],
-    "answer": "Deccan Chargers",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Who got the best bowling average in an IPL season (min 10 innings)?",
-    "options": ["Andrew Tye (11.5)", "Lasith Malinga (13.56)", "Harshal Patel(14.11)", "Sunil Narine 11.85"],
-    "answer": "Sunil Narine 11.85",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which stadium held the opening match of the first IPL season?",
-    "options": ["Wankhede Stadium", "M Chinnaswamy Stadium", "Eden Gardens", "MA Chidambaram Stadium"],
-    "answer": "M Chinnaswamy Stadium",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which player has the most IPL player of the match awards?",
-    "options": ["Chris Gayle", "AB de Villiers", "Rohit Sharma", "MS Dhoni"],
-    "answer": "AB de Villiers",
-    "difficulty": "medium"
-  },
-  {
-    "question": "In which year did the IPL have a mini-auction?",
-    "options": ["2010", "2014", "2023", "2019"],
-    "answer": "2023",
-    "difficulty": "hard"
-  },
-  {
-    "question": "Which team has the highest win percentage in IPL history?",
-    "options": ["Mumbai Indians", "Chennai Super Kings", "Kolkata Knight Riders", "Rajasthan Royals"],
-    "answer": "Chennai Super Kings",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Who was the first overseas captain to win an IPL title?",
-    "options": ["David Warner", "Shane Warne", "Adam Gilchrist", "Ricky Ponting"],
-    "answer": "Shane Warne",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which player has the most stumpings in IPL history?",
-    "options": ["Dinesh Karthik", "MS Dhoni", "Robin Uthappa", "Wriddhiman Saha"],
-    "answer": "MS Dhoni",
-    "difficulty": "easy"
-  },
-  {
-    "question": "What is the record for the most consecutive wins by a team in the IPL?",
-    "options": ["10", "11", "12", "13"],
-    "answer": "13",
-    "difficulty": "hard"
-  },
-  {
-    "question": "Which team has the most number of last-ball victories in IPL history?",
-    "options": ["Mumbai Indians", "Chennai Super Kings", "Rajasthan Royals", "Kolkata Knight Riders"],
-    "answer": "Rajasthan Royals",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Who won the first ever purple cap in IPL history?",
-    "options": ["RP Singh", "Sohail Tanvir", "Lasith Malinga", "Piyush Chawla"],
-    "answer": "RP Singh",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which player has the most catches as a fielder in a single IPL season?",
-    "options": ["Kieron Pollard", "Suresh Raina", "David Miller", "David Warner"],
-    "answer": "David Warner",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which stadium has hosted the most number of IPL matches?",
-    "options": ["Eden Gardens, Kolkata", "M. Chinnaswamy Stadium, Bengaluru", "Wankhede Stadium, Mumbai", "Feroz Shah Kotla (Arun Jaitley Stadium), Delhi"],
-    "answer": "Feroz Shah Kotla (Arun Jaitley Stadium), Delhi",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which player has hit the most boundaries (fours and sixes combined) in IPL history?",
-    "options": ["Virat Kohli", "David Warner", "Shikhar Dhawan", "Chris Gayle"],
-    "answer": "Shikhar Dhawan",
-    "difficulty": "easy"
-  },
-  {
-    "question": "In which IPL season were two new teams, Pune Warriors India and Kochi Tuskers Kerala, introduced?",
-    "options": ["2009", "2011", "2015", "2022"],
-    "answer": "2011",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Who holds the record for the most consecutive fifties in IPL history?",
-    "options": ["David Warner", "Virat Kohli", "KL Rahul", "Virender Sehwag"],
-    "answer": "Virender Sehwag",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which team has the lowest economy rate in an IPL season?",
-    "options": ["Mumbai Indians", "Chennai Super Kings", "Sunrisers Hyderabad", "Rajasthan Royals"],
-    "answer": "Sunrisers Hyderabad",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which player has the most dismissals as a wicket-keeper in IPL history?",
-    "options": ["Dinesh Karthik", "MS Dhoni", "Wriddhiman Saha", "Quinton de Kock"],
-    "answer": "MS Dhoni",
-    "difficulty": "easy"
-  },
-  {
-    "question": "In which year was the IPL final held outside India?",
-    "options": ["2009", "2014", "2020", "2021"],
-    "answer": "2009",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Who was the first player to score 50+ runs in 5 consecutive IPL innings?",
-    "options": ["Virat Kohli", "David Warner", "Virender Sehwag", "Jos Buttler"],
-    "answer": "Jos Buttler",
-    "difficulty": "medium"
-  },
-  {
-    "question": "Which team has the highest run rate in an IPL innings?",
-    "options": ["Royal Challengers Bangalore", "Kings XI Punjab", "Sunrisers Hyderabad", "Chennai Super Kings"],
-    "answer": "Sunrisers Hyderabad",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Who has the most no balls bowled in IPL history?",
-    "options": ["Lasith Malinga", "Sreesanth", "Jasprit Bumrah", "Umesh Yadav"],
-    "answer": "Sreesanth",
-    "difficulty": "easy"
-  },
-  {
-    "question": "In which IPL season was the strategic timeout rule changed?",
-    "options": ["2016", "2018", "2022", "2023"],
-    "answer": "2022",
-    "difficulty": "easy"
-  },
-  {
-    "question": "Which player has the highest strike rate in a winning run chase in IPL history?",
-    "options": ["Andre Russell", "Kieron Pollard", "Yusuf Pathan", "Pat Cummins"],
-    "answer": "Pat Cummins",
-    "difficulty": "medium"
-  }
-
-    // ... existing questions ...
-        {
-      "question": "Who was the first Indian to win the orange cap?",
-      "options": ["Sachin Tendulkar", "Virat Kohli", "Gautam Gambhir", "Rohit Sharma"],
-      "answer": "Sachin Tendulkar",
-      "difficulty": "easy"
+[
+    {
+        "question": "What is the primary goal of artificial intelligence?",
+        "information": "This field of computer science aims to create systems capable of performing tasks that would typically require human intelligence.",
+        "options": ["To simulate human intelligence", "To enhance computer speed", "To replace human jobs", "To improve data storage"],
+        "answer": "To simulate human intelligence"
     },
     {
-      "question": "Which player has the most 4 wicket hauls in a single IPL season?",
-      "options": ["Lasith Malinga", "James Faulkner", "Sunil Narine", "Yuzvendra Chahal"],
-      "answer": "James Faulkner",
-      "difficulty": "hard"
+        "question": "What is 'machine learning' in the context of artificial intelligence?",
+        "information": "This is a subset of artificial intelligence that involves the creation of systems that can learn from and make decisions based on data.",
+        "options": ["A new programming language", "A data processing method", "A subset of artificial intelligence", "A type of computer hardware"],
+        "answer": "A subset of artificial intelligence"
     },
     {
-      "question": "Which team has the most number of playoff appearances in IPL history?",
-      "options": ["Mumbai Indians", "Chennai Super Kings", "Royal Challengers Bangalore", "Kolkata Knight Riders"],
-      "answer": "Chennai Super Kings",
-      "difficulty": "easy"
+        "question": "What is a 'neural network' in terms of artificial intelligence?",
+        "information": "This is a computational model inspired by the human brain's network of neurons, used in machine learning for pattern recognition.",
+        "options": ["A computer virus", "A data storage solution", "A machine learning model", "A network security protocol"],
+        "answer": "A machine learning model"
     },
     {
-      "question": "Who has the most dot balls in IPL history?",
-      "options": ["Bhuvneshwar Kumar", "Jasprit Bumrah", "Lasith Malinga", "Ravichandran Ashwin"],
-      "answer": "Bhuvneshwar Kumar",
-      "difficulty": "easy"
+        "question": "Who is considered the father of artificial intelligence?",
+        "information": "This individual is credited with laying the groundwork for the field of artificial intelligence through his seminal work and research.",
+        "options": ["Alan Turing", "John McCarthy", "Elon Musk", "Stephen Hawking"],
+        "answer": "John McCarthy"
     },
     {
-      "question": "In which year did the IPL introduce the 'impact player' rule?",
-      "options": ["2021", "2022", "2023", "2024"],
-      "answer": "2023",
-      "difficulty": "easy"
+        "question": "What is the Turing Test used to evaluate?",
+        "information": "This test is used to assess a machine's ability to exhibit intelligent behavior equivalent to, or indistinguishable from, that of a human.",
+        "options": ["Artificial intelligence", "Computer speed", "Data storage capacity", "Network security"],
+        "answer": "Artificial intelligence"
     },
     {
-      "question": "Which player has the fastest 50 in an IPL final?",
-      "options": ["Kieron Pollard", "Ishan Kishan", "Yusuf Pathan", "Andre Russell"],
-      "answer": "Ishan Kishan",
-      "difficulty": "easy"
+        "question": "What is 'deep learning' in the context of artificial intelligence?",
+        "information": "This is a subset of machine learning involving neural networks with many layers, used for tasks like image recognition and natural language processing.",
+        "options": ["A type of artificial intelligence", "A programming methodology", "A computer network structure", "A database design"],
+        "answer": "A type of artificial intelligence"
     },
     {
-      "question": "Which team has the highest number of extras conceded in an IPL innings?",
-      "options": ["Delhi Capitals", "Kolkata Knight Riders", "Royal Challengers Bangalore", "Punjab Kings"],
-      "answer": "Royal Challengers Bangalore",
-      "difficulty": "medium"
+        "question": "Which of the following is an application of AI in daily life?",
+        "information": "Artificial intelligence can be used in many different fields and for various purposes.",
+        "options": ["Self-driving cars", "Manual data entry", "Traditional board games", "Mechanical switches"],
+        "answer": "Self-driving cars"
     },
     {
-      "question": "Who has the most catches in an IPL final?",
-      "options": ["Kieron Pollard", "Suresh Raina", "Ben Cutting", "Faf Du Plessis"],
-      "answer": "Ben Cutting",
-      "difficulty": "hard"
+        "question": "What does 'NLP' stand for in the context of artificial intelligence?",
+        "information": "This technology enables computers to understand, interpret, and produce human language and speech.",
+        "options": ["Natural Language Processing", "Numerical Logic Programming", "Nonlinear Performance Parameters", "Network Layer Protocols"],
+        "answer": "Natural Language Processing"
     },
     {
-      "question": "In which IPL season was the DRS (Decision Review System) introduced?",
-      "options": ["2016", "2018", "2020", "2022"],
-      "answer": "2018",
-      "difficulty": "medium"
+        "question": "What is reinforcement learning?",
+        "information": "This type of machine learning is based on the idea of agents that learn to make decisions by taking actions in an environment to achieve some notion of cumulative reward.",
+        "options": ["A form of supervised learning", "A type of unsupervised learning", "A kind of semi-supervised learning", "A model of machine learning"],
+        "answer": "A model of machine learning"
     },
     {
-      "question": "Which player has the most runs in the IPL playoffs?",
-      "options": ["Suresh Raina", "Virat Kohli", "Rohit Sharma", "Shikhar Dhawan"],
-      "answer": "Suresh Raina",
-      "difficulty": "easy"
-    },
-    {
-      "question": "Which IPL team has the highest number of tied matches?",
-      "options": ["Rajasthan Royals", "Mumbai Indians", "Chennai Super Kings", "Delhi Capitals"],
-      "answer": "Rajasthan Royals",
-      "difficulty": "hard"
-    },
-    {
-      "question": "Who has the lowest bowling economy in an IPL season (min 10 innings)?",
-      "options": ["Sunil Narine", "Rashid Khan", "Anil Kumble", "Lasith Malinga"],
-      "answer": "Sunil Narine",
-      "difficulty": "easy"
-    },
-    {
-      "question": "Which team has the most super over wins in the IPL?",
-      "options": ["Mumbai Indians", "Kolkata Knight Riders", "Chennai Super Kings", "Rajasthan Royals"],
-      "answer": "Kolkata Knight Riders",
-      "difficulty": "hard"
-    },
-    {
-      "question": "Who has the most IPL man of the series awards?",
-      "options": ["Shane Watson", "Andre Russell", "David Warner", "Virat Kohli"],
-      "answer": "Shane Watson",
-      "difficulty": "hard"
-    },
-    {
-      "question": "What was the first stadium to host an IPL final?",
-      "options": ["Wankhede Stadium", "DY Patil Stadium", "Eden Gardens", "M.A. Chidambaram Stadium"],
-      "answer": "DY Patil Stadium",
-      "difficulty": "easy"
-    },
-    {
-      "question": "Which player has the most IPL hat-tricks?",
-      "options": ["Amit Mishra", "Lasith Malinga", "Yuzvendra Chahal", "Sunil Narine"],
-      "answer": "Amit Mishra",
-      "difficulty": "hard"
-    },
-    {
-      "question": "Which team has the most consecutive losses in a single IPL season?",
-      "options": ["Delhi Capitals", "Royal Challengers Bangalore", "Pune Warriors India", "Punjab Kings"],
-      "answer": "Pune Warriors India",
-      "difficulty": "medium"
-    },
-    {
-      "question": "Who has the most runs in a single IPL final innings?",
-      "options": ["Manish Pandey", "Wriddhiman Saha", "Murali Vijay", "Ben Cutting"],
-      "answer": "Wriddhiman Saha",
-      "difficulty": "hard"
-    },
-    {
-      "question": "In what year was the first IPL auction held?",
-      "options": ["2007", "2008", "2009", "2010"],
-      "answer": "2008",
-      "difficulty": "easy"
+        "question": "Which of the following is a common use of AI in businesses?",
+        "information": "Artificial intelligence is being used to improve various aspects of businesses and customer experiences.",
+        "options": ["Customer service chatbots", "Paper file management", "Manual account calculations", "Traditional advertising methods"],
+        "answer": "Customer service chatbots"
     }
-  ]
+]
