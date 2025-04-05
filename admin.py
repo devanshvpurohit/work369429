@@ -48,17 +48,32 @@ def get_user_id():
 def quiz_page():
     st.markdown("""
         <style>
-            .main, .block-container {
-                padding-top: 0rem !important;
-                padding-bottom: 0rem !important;
-            }
-            body, .stApp {
+            html, body, .stApp {
                 background-color: #e6ffe6;
+                font-family: 'Arial', sans-serif;
+                font-size: 16px;
+                padding: 0;
+                margin: 0;
+            }
+            .main, .block-container {
+                padding-top: 1rem !important;
+                padding-bottom: 1rem !important;
+                max-width: 100% !important;
+            }
+            @media only screen and (max-width: 600px) {
+                html, body, .stApp {
+                    font-size: 14px;
+                }
+                .stRadio>div>label {
+                    font-size: 14px;
+                }
             }
             .stButton>button {
                 background-color: #00cc44;
                 color: white;
                 font-weight: bold;
+                border-radius: 8px;
+                padding: 0.5rem 1rem;
             }
             .stRadio>div>label {
                 color: #006622;
