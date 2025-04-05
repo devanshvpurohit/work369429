@@ -45,7 +45,7 @@ def insert_score(name, score, ip, time_taken):
         )
         conn.commit()
 
-# === SESSION ID Fallback ===
+# === GET UNIQUE USER ID ===
 def get_user_id():
     return st.session_state.get("user_id", str(time.time())[-6:])
 
@@ -85,6 +85,7 @@ def quiz_page():
             insert_score(name, score, ip, total_time)
             st.success(f"✅ {name}, you scored {score}/{len(quiz_data)}")
             st.info(f"⏱ Total Time Taken: {total_time} seconds")
+
             st.session_state.quiz_started = False
             st.cache_data.clear()
 
@@ -104,17 +105,19 @@ def quiz_page():
             st.session_state.current_question += 1
             st.session_state.question_start_time = time.time()
             st.experimental_rerun()
-        else:
-            st.subheader(f"⏱ Time Left: {int(remaining)} seconds")
-            with st.form(f"form_q{q_idx}"):
-                response = st.radio(question["question"], question["options"], key=f"q{q_idx}")
-                submitted = st.form_submit_button("Submit")
+            return
 
-                if submitted:
-                    st.session_state.responses.append((question["answer"], response))
-                    st.session_state.current_question += 1
-                    st.session_state.question_start_time = time.time()
-                    st.experimental_rerun()
+        st.subheader(f"⏱ Time Left: {int(remaining)} seconds")
+        with st.form(f"form_q{q_idx}"):
+            response = st.radio(question["question"], question["options"], key=f"q{q_idx}")
+            submitted = st.form_submit_button("Submit")
+
+            if submitted:
+                st.session_state.responses.append((question["answer"], response))
+                st.session_state.current_question += 1
+                st.session_state.question_start_time = time.time()
+                st.experimental_rerun()
+                return
 
 # === LEADERBOARD PAGE ===
 def leaderboard_page():
@@ -148,8 +151,8 @@ def leaderboard_page():
 def main():
     st.set_page_config(page_title="IPL Quiz", layout="centered")
     init_db()
-
     st.session_state.user_id = get_user_id()
+
     choice = st.sidebar.radio("📚 Menu", ["Take Quiz", "Leaderboard"])
     if choice == "Take Quiz":
         quiz_page()
