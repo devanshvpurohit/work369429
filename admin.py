@@ -46,7 +46,7 @@ def get_user_id():
     return st.session_state.get("user_id", str(time.time())[-6:])
 
 def quiz_page():
-    st.title("🏏 IPL Quiz")
+    st.title("\U0001F3CF IPL Quiz")
     name = st.text_input("Enter your name to begin")
     ip = get_user_id()
     df = load_data()
@@ -56,10 +56,9 @@ def quiz_page():
 
     already_played = not df[(df["name"] == name) & (df["ip"] == ip)].empty
     if already_played:
-        st.warning("🚫 You have already attempted the quiz with this name and device.")
+        st.warning("\u274C You have already attempted the quiz with this name and device.")
         return
 
-    # Start quiz setup
     if "quiz_started" not in st.session_state:
         st.session_state.quiz_started = False
 
@@ -75,7 +74,6 @@ def quiz_page():
             st.session_state.responses = []
             st.session_state.current_question = 0
             st.session_state.question_start_time = time.time()
-            st.session_state.timer_expired = False
 
     if st.session_state.quiz_started:
         questions = st.session_state.quiz_data
@@ -86,14 +84,14 @@ def quiz_page():
             total_time = round(end_time - st.session_state.start_time, 2)
             score = sum(1 for correct, given in st.session_state.responses if correct == given)
             insert_score(name, score, ip, total_time)
-            st.success(f"✅ {name}, you scored {score}/{len(questions)}")
-            st.info(f"⏱ Time Taken: {total_time} seconds")
+            st.success(f"\u2705 {name}, you scored {score}/{len(questions)}")
+            st.info(f"\u23F1 Time Taken: {total_time} seconds")
             st.session_state.quiz_started = False
             st.cache_data.clear()
 
             df = load_data()
             top10 = df.sort_values(by=["score", "time_taken"], ascending=[False, True]).head(10)
-            st.subheader("🏆 Real-Time Top 10 Leaderboard")
+            st.subheader("\U0001F3C6 Real-Time Top 10 Leaderboard")
             st.dataframe(top10[["name", "score", "ip", "time_taken"]].reset_index(drop=True), use_container_width=True)
             return
 
@@ -101,43 +99,38 @@ def quiz_page():
         elapsed = time.time() - st.session_state.question_start_time
         remaining = max(0, int(30 - elapsed))
         st.subheader(f"Question {q_idx + 1} of {len(questions)}")
-        st.write(f"⏳ Time remaining: {remaining} seconds")
-
-        if remaining == 0 and not st.session_state.timer_expired:
-            st.session_state.responses.append((question["answer"], "Skipped"))
-            st.session_state.current_question += 1
-            st.session_state.question_start_time = time.time()
-            st.session_state.timer_expired = False
-            st.experimental_rerun()
+        st.write(f"\u23F3 Time remaining: {remaining} seconds")
 
         with st.form(key=f"form_q{q_idx}"):
             response = st.radio(question["question"], question["options"], key=f"q{q_idx}")
-            next_q = st.form_submit_button("Submit")
-            if next_q:
-                st.session_state.responses.append((question["answer"], response))
+            submitted = st.form_submit_button("Submit")
+
+            if submitted or remaining == 0:
+                st.session_state.responses.append((question["answer"], response if submitted else "Skipped"))
                 st.session_state.current_question += 1
                 st.session_state.question_start_time = time.time()
 
+
 def leaderboard_page():
-    st.title("📊 Public Leaderboard")
+    st.title("\U0001F4CA Public Leaderboard")
     df = load_data()
     if df.empty:
         st.warning("No scores yet.")
         return
 
-    filter_date = st.selectbox("📅 Filter by date", ["All"] + sorted(df["date"].unique()))
+    filter_date = st.selectbox("\U0001F4C5 Filter by date", ["All"] + sorted(df["date"].unique()))
     if filter_date != "All":
         df = df[df["date"] == filter_date]
 
-    name_filter = st.text_input("🔍 Search by name")
+    name_filter = st.text_input("\U0001F50D Search by name")
     if name_filter:
         df = df[df["name"].str.contains(name_filter, case=False, na=False)]
 
     if not df.empty:
         csv = df.to_csv(index=False).encode("utf-8")
-        st.download_button("⬇️ Export CSV", csv, "quiz_results.csv", "text/csv")
+        st.download_button("\u2B07\uFE0F Export CSV", csv, "quiz_results.csv", "text/csv")
 
-    tab1, tab2 = st.tabs(["🏅 Highest Scores", "⚡ Fastest Perfect Scores"])
+    tab1, tab2 = st.tabs(["\U0001F3C5 Highest Scores", "\u26A1 Fastest Perfect Scores"])
 
     with tab1:
         top = df.sort_values(by=["score", "time_taken"], ascending=[False, True]).head(20)
@@ -153,7 +146,7 @@ def main():
     init_db()
     st.session_state.user_id = get_user_id()
 
-    menu = st.sidebar.radio("📚 Menu", ["Take Quiz", "Leaderboard"])
+    menu = st.sidebar.radio("\U0001F4DA Menu", ["Take Quiz", "Leaderboard"])
     if menu == "Take Quiz":
         quiz_page()
     else:
