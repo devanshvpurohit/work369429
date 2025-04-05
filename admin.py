@@ -28,14 +28,14 @@ def load_quiz_data():
     with open(path, "r") as f:
         return ast.literal_eval(f.read())
 
-# === CACHE: LOAD SCORES FROM DB ===
+# === LOAD SCORES FROM DB ===
 @st.cache_data(ttl=10)
 def load_data():
     with sqlite3.connect(DB_FILE) as conn:
         df = pd.read_sql_query("SELECT * FROM scores", conn)
     return df
 
-# === INSERT NEW SCORE ===
+# === INSERT SCORE INTO DB ===
 def insert_score(name, score, ip, time_taken):
     date = datetime.now().strftime("%Y-%m-%d")
     with sqlite3.connect(DB_FILE) as conn:
@@ -100,7 +100,6 @@ def quiz_page():
         remaining = 30 - elapsed
 
         if remaining <= 0:
-            st.warning("⏰ Time's up! Moving to next question...")
             st.session_state.responses.append((question["answer"], "Skipped"))
             st.session_state.current_question += 1
             st.session_state.question_start_time = time.time()
